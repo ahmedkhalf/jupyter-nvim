@@ -75,3 +75,8 @@ class JupyterNvim:
 
         self.nvim.api.buf_set_lines(bufnr, 0, lines, False, code)
 
+    @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
+    def vimOpened(self, filename):
+        # We use this to handle cases where bufadd doesn't trigger as buffer is
+        # added before vim enters
+        self.openNotebook(filename)
