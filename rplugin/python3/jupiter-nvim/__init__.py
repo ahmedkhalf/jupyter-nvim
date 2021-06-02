@@ -68,7 +68,7 @@ class JupyterNvim:
             #         if output.name == "stdout":
             #             code += output.text.splitlines()
 
-        self.nvim.api.buf_set_lines(bufnr, 0, lines, False, code)
+        self.lua_bridge.buf_set_lines(bufnr, 0, lines, False, code)
 
     @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
     def vimOpened(self, filename):

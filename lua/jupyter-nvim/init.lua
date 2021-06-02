@@ -2,8 +2,8 @@ local a = vim.api
 local M = {}
 
 M.create_jupyter_buffer = function (name, vertical)
-  local buf = a.nvim_create_buf(true, true)
-  a.nvim_command("buffer " .. buf) -- Focus on buffer
+  local bufnr = a.nvim_create_buf(true, true)
+  a.nvim_command("buffer " .. bufnr) -- Focus on buffer
   -- a.nvim_win_set_option(0, "number", false)
   -- a.nvim_win_set_option(0, "signcolumn", "no")
   a.nvim_command("setlocal nonumber")
@@ -14,7 +14,9 @@ M.create_jupyter_buffer = function (name, vertical)
   M.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment')
   M.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment')
 
-  return buf
+  a.nvim_buf_set_option(bufnr, "modifiable", false)
+
+  return bufnr
 end
 
 M.add_syntax = function (filetype, startPattern, endPattern, matchgroup)
@@ -37,6 +39,14 @@ M.add_syntax = function (filetype, startPattern, endPattern, matchgroup)
   region = region .. " concealends"
 
   a.nvim_command(region)
+end
+
+M.buf_set_lines = function (bufnr, startIndex, endIndex, strict, replacement)
+  a.nvim_buf_set_option(bufnr, "modifiable", true)
+
+  a.nvim_buf_set_lines(bufnr, startIndex, endIndex, strict, replacement)
+
+  a.nvim_buf_set_option(bufnr, "modifiable", false)
 end
 
 return M
