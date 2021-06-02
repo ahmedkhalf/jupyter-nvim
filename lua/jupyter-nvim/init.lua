@@ -10,6 +10,10 @@ M.create_jupyter_buffer = function (name, vertical)
   a.nvim_command("setlocal signcolumn=no")
   a.nvim_command("setlocal conceallevel=3")
   a.nvim_command("setlocal concealcursor=nvic")
+
+  M.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment')
+  M.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment')
+
   return buf
 end
 

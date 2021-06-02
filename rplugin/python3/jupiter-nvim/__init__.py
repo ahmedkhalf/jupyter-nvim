@@ -41,11 +41,6 @@ class JupyterNvim:
         bufnr = self.lua_bridge.create_jupyter_buffer()
         self.nvim.command("bdelete " + str(old_bufnr))
 
-        self.lua_bridge.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment')
-        self.lua_bridge.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment')
-
-        # self.nvim.command("hi! JupyterNvimCodeRegionComment guibg=none guifg=#2B2D37 ctermbg=none ctermfg=none")
-
         lines = self.nvim.api.buf_line_count(bufnr)
 
         nb = nbformat.read(filename, as_version=4)
