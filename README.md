@@ -10,6 +10,10 @@ Read jupyter notebooks in neovim
 
 Just open any `*.ipynb` file and voila!
 
+## ✨ Contributing
+
+All contributions are welcome! Even bug report count as a contribution, so if there is anything off don't hesitate to open an issue.
+
 ## 🚀 TODO
 
 - Improve read of \*.ipynb file
