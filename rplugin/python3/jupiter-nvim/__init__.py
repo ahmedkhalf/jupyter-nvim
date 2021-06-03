@@ -76,8 +76,6 @@ class JupyterNvim:
 
     @pynvim.autocmd('BufAdd', pattern='*.ipynb', eval='expand("<afile>")')
     def openNotebook(self, filename):
-        self.nvim.api.echo([["Openning Notebook: " + filename]], False, {})
-
         old_bufnr = self.nvim.current.buffer.number
 
         bufnr = self.lua_bridge.create_jupyter_buffer()
