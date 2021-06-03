@@ -1,4 +1,4 @@
-# 🪐 Jupiter-Nvim
+# 🪐 Jupyter-Nvim
 
 Read jupyter notebooks in neovim
 
