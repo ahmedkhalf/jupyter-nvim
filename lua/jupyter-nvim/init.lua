@@ -1,7 +1,7 @@
 local a = vim.api
 local M = {}
 
-M.create_jupyter_buffer = function (name, vertical)
+M.create_jupyter_buffer = function ()
   local bufnr = a.nvim_create_buf(true, true)
   a.nvim_command("buffer " .. bufnr) -- Focus on buffer
   -- a.nvim_win_set_option(0, "number", false)
