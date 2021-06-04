@@ -57,7 +57,7 @@ class JupyterNvim:
             highlight_text += "py@"
         else:
             # Shouldn't happen, but just in case...
-            highlight_text == ""
+            highlight_text = ""
 
         return highlight_text
 
@@ -74,14 +74,21 @@ class JupyterNvim:
 
         return (highlight_text + stdout).splitlines()
 
+    @pynvim.function("JupiterSave")
+    def writeNotebook(self, filename):
+        self.nvim.api.buf_set_option(0, "modified", False)
+        self.lua_bridge.print_error(
+            "Did not write file as jupiter-nvim doesn't have write support... yet."
+        )
+
     @pynvim.autocmd('BufAdd', pattern='*.ipynb', eval='expand("<afile>")')
     def openNotebook(self, filename):
         old_bufnr = self.nvim.current.buffer.number
+        old_buf_name = self.nvim.api.buf_get_name(old_bufnr)
 
         bufnr = self.lua_bridge.create_jupyter_buffer()
         self.nvim.command("bdelete " + str(old_bufnr))
-
-        lines = self.nvim.api.buf_line_count(bufnr)
+        self.nvim.api.buf_set_name(bufnr, old_buf_name)
 
         nb = nbformat.read(filename, as_version=4)
         code = []
@@ -94,7 +101,8 @@ class JupyterNvim:
             code += self.get_block_footer(cell)
             code.append("")
 
-        self.lua_bridge.buf_set_lines(bufnr, 0, lines, False, code)
+        lines = self.nvim.api.buf_line_count(bufnr)
+        self.lua_bridge.buf_set_lines(bufnr, False, 0, lines, False, code)
 
     @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
     def vimOpened(self, filename):

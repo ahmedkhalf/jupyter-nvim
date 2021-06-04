@@ -1,20 +1,24 @@
 local a = vim.api
+local cmd = vim.cmd
 local M = {}
 
 M.create_jupyter_buffer = function ()
   local bufnr = a.nvim_create_buf(true, true)
-  a.nvim_command("buffer " .. bufnr) -- Focus on buffer
+  cmd("buffer " .. bufnr) -- Focus on buffer
   -- a.nvim_win_set_option(0, "number", false)
   -- a.nvim_win_set_option(0, "signcolumn", "no")
-  a.nvim_command("setlocal nonumber")
-  a.nvim_command("setlocal signcolumn=no")
-  a.nvim_command("setlocal conceallevel=3")
-  a.nvim_command("setlocal concealcursor=nvic")
+  cmd("setlocal nonumber")
+  cmd("setlocal signcolumn=no")
+  cmd("setlocal conceallevel=3")
+  cmd("setlocal concealcursor=nvic")
 
   M.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment')
   M.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment')
 
   a.nvim_buf_set_option(bufnr, "modifiable", false)
+  a.nvim_buf_set_option(bufnr, "buftype", "acwrite")
+
+  cmd("au BufWriteCmd <buffer>  call JupiterSave()")
 
   return bufnr
 end
@@ -26,7 +30,7 @@ M.add_syntax = function (filetype, startPattern, endPattern, matchgroup)
     a.nvim_buf_del_var(0, 'current_syntax')
   end
 
-  a.nvim_command('syntax include @' .. group .. ' syntax/' .. filetype .. '.vim')
+  cmd('syntax include @' .. group .. ' syntax/' .. filetype .. '.vim')
 
   local region = ""
   region = region .. 'syntax region textSnip' .. ft
@@ -38,15 +42,23 @@ M.add_syntax = function (filetype, startPattern, endPattern, matchgroup)
   region = region .. " contains=@" .. group
   region = region .. " concealends"
 
-  a.nvim_command(region)
+  cmd(region)
 end
 
-M.buf_set_lines = function (bufnr, startIndex, endIndex, strict, replacement)
+M.buf_set_lines = function (bufnr, modified, startIndex, endIndex, strict, replacement)
   a.nvim_buf_set_option(bufnr, "modifiable", true)
 
   a.nvim_buf_set_lines(bufnr, startIndex, endIndex, strict, replacement)
 
   a.nvim_buf_set_option(bufnr, "modifiable", false)
+
+  a.nvim_buf_set_option(bufnr, "modified", modified)
+end
+
+M.print_error = function (msg)
+  cmd("echohl ErrorMsg")
+  cmd("echomsg \"" .. msg .. "\"")
+  cmd("echohl None")
 end
 
 return M
