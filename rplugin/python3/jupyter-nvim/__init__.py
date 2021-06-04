@@ -77,7 +77,7 @@ class JupyterNvim:
     @pynvim.function("JupiterSave")
     def writeNotebook(self, filename):
         self.nvim.api.buf_set_option(0, "modified", False)
-        self.lua_bridge.print_error(
+        self.lua_bridge.utils.print_error(
             "Did not write file as jupiter-nvim doesn't have write support... yet.",
             True
         )
@@ -87,7 +87,7 @@ class JupyterNvim:
         old_bufnr = self.nvim.current.buffer.number
         old_buf_name = self.nvim.api.buf_get_name(old_bufnr)
 
-        bufnr = self.lua_bridge.create_jupyter_buffer()
+        bufnr = self.lua_bridge.utils.create_jupyter_buffer()
         self.nvim.command("bdelete " + str(old_bufnr))
         self.nvim.api.buf_set_name(bufnr, old_buf_name)
 
@@ -103,7 +103,7 @@ class JupyterNvim:
             code.append("")
 
         lines = self.nvim.api.buf_line_count(bufnr)
-        self.lua_bridge.buf_set_lines(bufnr, False, 0, lines, False, code)
+        self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, code)
 
     @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
     def vimOpened(self, filename):
