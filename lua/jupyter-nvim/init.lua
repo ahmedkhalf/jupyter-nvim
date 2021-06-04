@@ -55,7 +55,11 @@ M.buf_set_lines = function (bufnr, modified, startIndex, endIndex, strict, repla
   a.nvim_buf_set_option(bufnr, "modified", modified)
 end
 
-M.print_error = function (msg)
+M.print_error = function (msg, beep)
+  if beep then
+    cmd("execute 'normal! \\<Esc>'")
+  end
+    
   cmd("echohl ErrorMsg")
   cmd("echomsg \"" .. msg .. "\"")
   cmd("echohl None")

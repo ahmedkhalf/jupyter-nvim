@@ -78,7 +78,8 @@ class JupyterNvim:
     def writeNotebook(self, filename):
         self.nvim.api.buf_set_option(0, "modified", False)
         self.lua_bridge.print_error(
-            "Did not write file as jupiter-nvim doesn't have write support... yet."
+            "Did not write file as jupiter-nvim doesn't have write support... yet.",
+            True
         )
 
     @pynvim.autocmd('BufAdd', pattern='*.ipynb', eval='expand("<afile>")')
