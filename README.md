@@ -16,13 +16,4 @@ All contributions are welcome! Even bug report count as a contribution, so if th
 
 ## 🚀 TODO
 
-- Improve read of \*.ipynb file
-  - ~~Support execution number and stdout~~
-  - Suppport images
-  - Support widgets
-- Add run code support in notebook
-- Add save notebook support
-- Add tree-sitter support
-- Add ipython shell support
-- Add jupyter qtconsole support
-
+You can find the todo on [github projects](https://github.com/ahmedkhalf/jupyter-nvim/projects/1).
