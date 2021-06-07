@@ -3,12 +3,11 @@ local cmd = vim.cmd
 local M = {}
 
 M.create_jupyter_buffer = function ()
-  local bufnr = a.nvim_create_buf(true, true)
+  local bufnr = a.nvim_create_buf(true, false)
   cmd("buffer " .. bufnr) -- Focus on buffer
-  -- a.nvim_win_set_option(0, "number", false)
-  -- a.nvim_win_set_option(0, "signcolumn", "no")
+
   cmd("setlocal nonumber")
-  cmd("setlocal signcolumn=no")
+  cmd("setlocal signcolumn=auto:1-2")
   cmd("setlocal conceallevel=3")
   cmd("setlocal concealcursor=nvic")
 
@@ -52,7 +51,9 @@ M.buf_set_lines = function (bufnr, modified, startIndex, endIndex, strict, repla
 
   a.nvim_buf_set_option(bufnr, "modifiable", false)
 
-  a.nvim_buf_set_option(bufnr, "modified", modified)
+  if modified == false then
+    a.nvim_buf_set_option(bufnr, "modified", modified)
+  end
 end
 
 M.print_error = function (msg, beep)
