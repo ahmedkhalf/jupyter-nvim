@@ -7,7 +7,7 @@ M.create_jupyter_buffer = function ()
   cmd("buffer " .. bufnr) -- Focus on buffer
 
   cmd("setlocal nonumber")
-  cmd("setlocal signcolumn=auto:1-2")
+  cmd("setlocal signcolumn=no")
   cmd("setlocal conceallevel=3")
   cmd("setlocal concealcursor=nvic")
 
