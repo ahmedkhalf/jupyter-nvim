@@ -1,3 +1,5 @@
+from . import utils
+
 import pynvim
 
 import nbformat
@@ -88,8 +90,10 @@ class JupyterNvim:
         old_buf_name = self.nvim.api.buf_get_name(old_bufnr)
 
         bufnr = self.lua_bridge.utils.create_jupyter_buffer()
-        self.nvim.command("bdelete " + str(old_bufnr))
-        self.nvim.api.buf_set_name(bufnr, old_buf_name)
+        start_call = utils.AtomicCall(self.nvim)
+        start_call.add_call("nvim_command", "bdelete " + str(old_bufnr))
+        start_call.add_call("nvim_buf_set_name", bufnr, old_buf_name)
+        start_call.call(True)
 
         nb = nbformat.read(filename, as_version=4)
         code = []
