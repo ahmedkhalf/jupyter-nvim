@@ -2,26 +2,6 @@ local a = vim.api
 local cmd = vim.cmd
 local M = {}
 
-M.create_jupyter_buffer = function ()
-  local bufnr = a.nvim_create_buf(true, false)
-  cmd("buffer " .. bufnr) -- Focus on buffer
-
-  cmd("setlocal nonumber")
-  cmd("setlocal signcolumn=no")
-  cmd("setlocal conceallevel=3")
-  cmd("setlocal concealcursor=nvic")
-
-  M.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment')
-  M.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment')
-
-  a.nvim_buf_set_option(bufnr, "modifiable", false)
-  a.nvim_buf_set_option(bufnr, "buftype", "acwrite")
-
-  cmd("au BufWriteCmd <buffer>  call JupiterSave()")
-
-  return bufnr
-end
-
 M.add_syntax = function (filetype, startPattern, endPattern, matchgroup)
   local ft = vim.fn.toupper(filetype)
   local group = 'textGroup' .. ft

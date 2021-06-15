@@ -86,14 +86,12 @@ class JupyterNvim:
 
     @pynvim.autocmd('BufAdd', pattern='*.ipynb', eval='expand("<afile>")')
     def openNotebook(self, filename):
-        old_bufnr = self.nvim.current.buffer.number
-        old_buf_name = self.nvim.api.buf_get_name(old_bufnr)
+        bufnr = utils.create_jupyter_buffer(self.nvim)
+        self.lua_bridge.utils.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment', async_=True)
+        self.lua_bridge.utils.add_syntax("markdown", "@begin=md@", "@end=md@", 'SpecialComment', async_=True)
 
-        bufnr = self.lua_bridge.utils.create_jupyter_buffer()
-        start_call = utils.AtomicCall(self.nvim)
-        start_call.add_call("nvim_command", "bdelete " + str(old_bufnr))
-        start_call.add_call("nvim_buf_set_name", bufnr, old_buf_name)
-        start_call.call(True)
+        lines = self.nvim.api.buf_line_count(bufnr)
+        self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, ["Loading..."])
 
         nb = nbformat.read(filename, as_version=4)
         code = []
