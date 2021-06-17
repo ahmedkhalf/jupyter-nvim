@@ -1,6 +1,96 @@
+import enum
+
+import nbformat
+
+
+class CellType(enum.Enum):
+    Markdown = 1
+    Code = 2
+    Raw = 3
+
+
+class Cell():
+    def __init__(self, cell) -> None:
+        self._cell = cell
+
+        self.cell_type = None
+        self.source = None
+        self.execution_count = None
+        self.outputs = None
+
+        self.init()
+
+    def init(self):
+        if self._cell.cell_type == "markdown":
+            self.cell_type = CellType.Markdown
+        elif self._cell.cell_type == "code":
+            self.cell_type = CellType.Code
+        else:
+            self.cell_type = CellType.Raw
+
+        self.source = self._cell.source
+
+        if self.cell_type == CellType.Code:
+            self.execution_count = self._cell.execution_count
+            # TODO Add output class
+            self.outputs = self._cell.outputs
+
+    def get_cell_highlight(self, begin: bool) -> str:
+        highlight_text = ""
+
+        if self.cell_type == CellType.Raw:
+            return highlight_text
+
+        if begin:
+            highlight_text = "@begin="
+        else:
+            highlight_text = "@end="
+
+        if self.cell_type == CellType.Markdown:
+            highlight_text += "md@"
+        else:
+            highlight_text += "py@"
+
+        return highlight_text
+
+    def get_cell_execution_count(self) -> str:
+        if self.cell_type != CellType.Code:
+            return ""
+        
+        if self.execution_count != None:
+            return f"[{self.execution_count}] "
+
+        return "[ ] "
+
+    def get_cell_header(self) -> str:
+        exec_count = self.get_cell_execution_count()
+        highlight_text = self.get_cell_highlight(True)
+        return exec_count + highlight_text
+
+    def get_cell_footer(self) -> str:
+        highlight_text = self.get_cell_highlight(False)
+        return highlight_text
+
+
 class Notebook:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, filename) -> None:
+        self._nb = None
+        self._cells = []
+
+        self.read(filename)
+
+    def read(self, filename):
+        self._nb = nbformat.read(filename, as_version=4)
+
+    def cells(self):
+        if not self._cells:
+            for cell in self._nb.cells:
+                item = Cell(cell)
+                self._cells.append(item)
+                yield item
+        else:
+            for cell in self._cells:
+                yield cell
 
 
 class NotebookManager:

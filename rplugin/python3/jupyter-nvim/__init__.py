@@ -11,71 +11,6 @@ class JupyterNvim:
         self.nvim.exec_lua("_jupiter_nvim = require('jupyter-nvim')")
         self.lua_bridge = self.nvim.lua._jupiter_nvim
 
-    def get_cell_stdout(self, cell):
-        cell_stdout = ""
-        if cell.cell_type == 'code':
-            if len(cell.outputs) > 0:
-                cell_stdout += "Output:\n"
-
-            for output in cell.outputs:
-                if output.name == "stdout":
-                    cell_stdout += output.text
-                    
-        return cell_stdout
-
-    def get_execution_count(self, cell):
-        execution_count = ""
-        if cell.cell_type == 'code':
-            if cell.execution_count != None:
-                execution_count += f"[{cell.execution_count}] "
-            else:
-                execution_count += "[ ] "
-        return execution_count
-
-    def get_cell_actions(self, cell):
-        # Currently cell actions are purely here for cosmetic purposes, later
-        # in the project you will be able to click on them and produce an
-        # action.
-        type = cell.cell_type
-
-        if type == "markdown":
-            return "Delete Cell"
-        elif type == "code":
-            return "Run Code | Delete Cell"
-        return ""
-
-    def get_highlight_text(self, cell, begin: bool):
-        type = cell.cell_type
-        highlight_text = ""
-
-        if begin:
-            highlight_text = "@begin="
-        else:
-            highlight_text = "@end="
-
-        if type == "markdown":
-            highlight_text += "md@"
-        elif type == "code":
-            highlight_text += "py@"
-        else:
-            # Shouldn't happen, but just in case...
-            highlight_text = ""
-
-        return highlight_text
-
-    def get_block_header(self, cell):
-        exec_count = self.get_execution_count(cell)
-        cell_actions = self.get_cell_actions(cell)
-        highlight_text = self.get_highlight_text(cell, True)
-
-        return exec_count + cell_actions + highlight_text
-
-    def get_block_footer(self, cell):
-        highlight_text = self.get_highlight_text(cell, False)
-        stdout = self.get_cell_stdout(cell)
-
-        return (highlight_text + stdout).splitlines()
-
     @pynvim.function("JupiterSave")
     def writeNotebook(self, filename):
         self.nvim.api.buf_set_option(0, "modified", False)
@@ -93,15 +28,15 @@ class JupyterNvim:
         lines = self.nvim.api.buf_line_count(bufnr)
         self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, ["Loading..."])
 
-        nb = nbformat.read(filename, as_version=4)
+        nb = utils.Notebook(filename)
         code = []
 
-        for cell in nb.cells:
-            code.append(self.get_block_header(cell))
+        for cell in nb.cells():
+            code.append(cell.get_cell_header())
 
             code += cell.source.splitlines()
 
-            code += self.get_block_footer(cell)
+            code.append(cell.get_cell_footer())
             code.append("")
 
         lines = self.nvim.api.buf_line_count(bufnr)
