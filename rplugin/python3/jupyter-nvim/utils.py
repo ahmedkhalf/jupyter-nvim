@@ -53,6 +53,13 @@ class Cell():
 
         return highlight_text
 
+    def get_cell_actions(self) -> str:
+        actions = ""
+        if self.cell_type == CellType.Code:
+            actions += "Run cell | "
+        actions += "Delete cell"
+        return actions
+
     def get_cell_execution_count(self) -> str:
         if self.cell_type != CellType.Code:
             return ""
@@ -64,8 +71,9 @@ class Cell():
 
     def get_cell_header(self) -> str:
         exec_count = self.get_cell_execution_count()
+        actions = self.get_cell_actions()
         highlight_text = self.get_cell_highlight(True)
-        return exec_count + highlight_text
+        return exec_count + actions + highlight_text
 
     def get_cell_footer(self) -> str:
         highlight_text = self.get_cell_highlight(False)
