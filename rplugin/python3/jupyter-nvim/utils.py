@@ -102,13 +102,15 @@ class Notebook:
 
 
 class NotebookManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.notebooks = {}
 
-    def add_notebook(self, bufnr, nb):
+    def add_notebook(self, bufnr, filename) -> Notebook:
+        nb = Notebook(filename)
         self.notebooks[bufnr] = nb
+        return nb
 
-    def del_notebook(self, bufnr):
+    def del_notebook(self, bufnr) -> None:
         del self.notebooks[bufnr]
 
 
