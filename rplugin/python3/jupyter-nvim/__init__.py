@@ -8,7 +8,7 @@ class JupyterNvim:
         self.nvim: pynvim.Nvim = nvim
         self.nvim.exec_lua("_jupiter_nvim = require('jupyter-nvim')")
         self.lua_bridge = self.nvim.lua._jupiter_nvim
-        self.notebook_manager = utils.NotebookManager()
+        self.notebook_manager = utils.NotebookManager(self.nvim, self.lua_bridge)
 
     @pynvim.function("JupiterSave")
     def writeNotebook(self, filename):
@@ -28,18 +28,7 @@ class JupyterNvim:
         self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, ["Loading..."])
 
         nb = self.notebook_manager.add_notebook(bufnr, filename)
-        code = []
-
-        for cell in nb.cells():
-            code.append(cell.get_header())
-
-            code += cell.source.splitlines()
-
-            code.append(cell.get_footer())
-            code.append("")
-
-        lines = self.nvim.api.buf_line_count(bufnr)
-        self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, code)
+        nb.draw_full()
 
     @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
     def vimOpened(self, filename):

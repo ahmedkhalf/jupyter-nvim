@@ -81,14 +81,14 @@ class Cell():
 
 
 class Notebook:
-    def __init__(self, filename) -> None:
-        self._nb = None
+    def __init__(self, filename, bufnr, nvim, lua_bridge) -> None:
+        self._nb = nbformat.read(filename, as_version=4)
         self._cells = []
 
-        self.read(filename)
+        self._nvim = nvim
+        self._lua_bridge = lua_bridge
 
-    def read(self, filename):
-        self._nb = nbformat.read(filename, as_version=4)
+        self.bufnr = bufnr
 
     def cells(self):
         if not self._cells:
@@ -100,13 +100,30 @@ class Notebook:
             for cell in self._cells:
                 yield cell
 
+    def draw_full(self):
+        code = []
+        for cell in self.cells():
+            code.append(cell.get_header())
+
+            code += cell.source.splitlines()
+
+            code.append(cell.get_footer())
+
+            code.append("")
+
+        lines = self._nvim.api.buf_line_count(self.bufnr)
+        self._lua_bridge.utils.buf_set_lines(self.bufnr, False, 0, lines, False, code, async_=True)
+
 
 class NotebookManager:
-    def __init__(self) -> None:
+    def __init__(self, nvim, lua_bridge) -> None:
+        self._nvim = nvim
+        self._lua_bridge = lua_bridge
+
         self.notebooks = {}
 
     def add_notebook(self, bufnr, filename) -> Notebook:
-        nb = Notebook(filename)
+        nb = Notebook(filename, bufnr, self._nvim, self._lua_bridge)
         self.notebooks[bufnr] = nb
         return nb
 
