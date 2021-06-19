@@ -153,12 +153,3 @@ def create_jupyter_buffer(nvim):
         start_call.call(async_=True)
 
         return bufnr
-
-def buf_set_line(nvim, bufnr, modified, startIndex, endIndex, strict, replacement):
-    line_call = AtomicCall(nvim)
-    line_call.add_call("nvim_buf_set_option", bufnr, "modifiable", True)
-    line_call.add_call("nvim_buf_set_lines", bufnr, startIndex, endIndex, strict, replacement)
-    line_call.add_call("nvim_buf_set_option", "modifiable", False)
-    if not modified:
-        line_call.add_call("nvim_buf_set_option", bufnr, "modified", modified)
-    return line_call
