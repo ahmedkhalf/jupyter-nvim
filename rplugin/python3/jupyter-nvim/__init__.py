@@ -2,8 +2,6 @@ from . import utils
 
 import pynvim
 
-import nbformat
-
 @pynvim.plugin
 class JupyterNvim:
     def __init__(self, nvim):
@@ -33,11 +31,11 @@ class JupyterNvim:
         code = []
 
         for cell in nb.cells():
-            code.append(cell.get_cell_header())
+            code.append(cell.get_header())
 
             code += cell.source.splitlines()
 
-            code.append(cell.get_cell_footer())
+            code.append(cell.get_footer())
             code.append("")
 
         lines = self.nvim.api.buf_line_count(bufnr)

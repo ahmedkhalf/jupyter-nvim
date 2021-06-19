@@ -35,7 +35,7 @@ class Cell():
             # TODO Add output class
             self.outputs = self._cell.outputs
 
-    def get_cell_highlight(self, begin: bool) -> str:
+    def get_highlight(self, begin: bool) -> str:
         highlight_text = ""
 
         if self.cell_type == CellType.Raw:
@@ -53,14 +53,14 @@ class Cell():
 
         return highlight_text
 
-    def get_cell_actions(self) -> str:
+    def get_actions(self) -> str:
         actions = ""
         if self.cell_type == CellType.Code:
             actions += "Run cell | "
         actions += "Delete cell"
         return actions
 
-    def get_cell_execution_count(self) -> str:
+    def get_execution_count(self) -> str:
         if self.cell_type != CellType.Code:
             return ""
         
@@ -69,14 +69,14 @@ class Cell():
 
         return "[ ] "
 
-    def get_cell_header(self) -> str:
-        exec_count = self.get_cell_execution_count()
-        actions = self.get_cell_actions()
-        highlight_text = self.get_cell_highlight(True)
+    def get_header(self) -> str:
+        exec_count = self.get_execution_count()
+        actions = self.get_actions()
+        highlight_text = self.get_highlight(True)
         return exec_count + actions + highlight_text
 
-    def get_cell_footer(self) -> str:
-        highlight_text = self.get_cell_highlight(False)
+    def get_footer(self) -> str:
+        highlight_text = self.get_highlight(False)
         return highlight_text
 
 
