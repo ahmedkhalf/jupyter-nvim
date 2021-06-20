@@ -1,83 +1,6 @@
-import enum
-
 import nbformat
 
-
-class CellType(enum.Enum):
-    Markdown = 1
-    Code = 2
-    Raw = 3
-
-
-class Cell():
-    def __init__(self, cell) -> None:
-        self._cell = cell
-
-        self.cell_type = None
-        self.source = None
-        self.execution_count = None
-        self.outputs = None
-
-        self.init()
-
-    def init(self):
-        if self._cell.cell_type == "markdown":
-            self.cell_type = CellType.Markdown
-        elif self._cell.cell_type == "code":
-            self.cell_type = CellType.Code
-        else:
-            self.cell_type = CellType.Raw
-
-        self.source = self._cell.source
-
-        if self.cell_type == CellType.Code:
-            self.execution_count = self._cell.execution_count
-            # TODO Add output class
-            self.outputs = self._cell.outputs
-
-    def get_highlight(self, begin: bool) -> str:
-        highlight_text = ""
-
-        if self.cell_type == CellType.Raw:
-            return highlight_text
-
-        if begin:
-            highlight_text = "@begin="
-        else:
-            highlight_text = "@end="
-
-        if self.cell_type == CellType.Markdown:
-            highlight_text += "md@"
-        else:
-            highlight_text += "py@"
-
-        return highlight_text
-
-    def get_actions(self) -> str:
-        actions = ""
-        if self.cell_type == CellType.Code:
-            actions += "Run cell | "
-        actions += "Delete cell"
-        return actions
-
-    def get_execution_count(self) -> str:
-        if self.cell_type != CellType.Code:
-            return ""
-        
-        if self.execution_count != None:
-            return f"[{self.execution_count}] "
-
-        return "[ ] "
-
-    def get_header(self) -> str:
-        exec_count = self.get_execution_count()
-        actions = self.get_actions()
-        highlight_text = self.get_highlight(True)
-        return exec_count + actions + highlight_text
-
-    def get_footer(self) -> str:
-        highlight_text = self.get_highlight(False)
-        return highlight_text
+from . import cell
 
 
 class Notebook:
@@ -90,26 +13,24 @@ class Notebook:
 
         self.bufnr = bufnr
 
+
+        for _cell in self._nb.cells:
+            type = _cell.cell_type
+            if type == "markdown":
+                self._cells.append(cell.MarkdownCell(_cell))
+            elif type == "code":
+                self._cells.append(cell.CodeCell(_cell))
+            else:
+                self._cells.append(cell.RawCell(_cell))
+
     def cells(self):
-        if not self._cells:
-            for cell in self._nb.cells:
-                item = Cell(cell)
-                self._cells.append(item)
-                yield item
-        else:
-            for cell in self._cells:
-                yield cell
+        for cell in self._cells:
+            yield cell
 
     def draw_full(self):
         code = []
         for cell in self.cells():
-            code.append(cell.get_header())
-
-            code += cell.source.splitlines()
-
-            code.append(cell.get_footer())
-
-            code.append("")
+            code += cell.get_content()
 
         lines = self._nvim.api.buf_line_count(self.bufnr)
         self._lua_bridge.utils.buf_set_lines(self.bufnr, False, 0, lines, False, code, async_=True)
