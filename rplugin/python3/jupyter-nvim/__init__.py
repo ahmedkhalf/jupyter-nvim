@@ -18,7 +18,7 @@ class JupyterNvim:
             True
         )
 
-    @pynvim.autocmd('BufAdd', pattern='*.ipynb', eval='expand("<afile>")')
+    @pynvim.autocmd('BufReadPost', pattern='*.ipynb', eval='expand("<afile>")', sync=True)
     def openNotebook(self, filename):
         bufnr = utils.create_jupyter_buffer(self.nvim)
         self.lua_bridge.utils.add_syntax("python", "@begin=py@", "@end=py@", 'SpecialComment', async_=True)
@@ -27,8 +27,10 @@ class JupyterNvim:
         lines = self.nvim.api.buf_line_count(bufnr)
         self.lua_bridge.utils.buf_set_lines(bufnr, False, 0, lines, False, ["Loading..."])
 
-        nb = self.notebook_manager.add_notebook(bufnr, filename)
-        nb.draw_full()
+        def write_notebook():
+            nb = self.notebook_manager.add_notebook(bufnr, filename)
+            nb.draw_full()
+        self.nvim.async_call(write_notebook)
 
     @pynvim.autocmd('VimEnter', pattern='*.ipynb', eval='expand("<afile>")')
     def vimOpened(self, filename):
