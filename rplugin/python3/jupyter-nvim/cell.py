@@ -17,6 +17,7 @@ class Section:
 class Cell:
     def __init__(self, cell) -> None:
         self._cell = cell
+        self._metadata = self._cell.metadata
 
         self.header = Section()
         self.source = Section()
@@ -56,6 +57,9 @@ class MarkdownCell(Cell):
 
 class CodeCell(Cell):
     def __init__(self, cell) -> None:
+        self.outputs = cell.outputs  # list of output dicts
+        self.init_output()
+
         self.execution_count = cell.execution_count
 
         super().__init__(cell)
@@ -69,7 +73,27 @@ class CodeCell(Cell):
         self.header.set_text(exec_count + actions + highlight, oneline=True)
 
     def init_footer(self):
-        self.footer.set_text("@end=py@")
+        if len(self.outputs) == 0:
+            self.footer.set_text("@end=py@")
+        else:
+            self.footer.set_text("@end=py@" + "Output:")
+
+    def init_output(self):
+        output_text = []
+        for output in self.outputs:
+            if output.output_type == "stream":
+                output_text += output.text.splitlines()
+            # elif output.output_type == "error":
+            #     for frame in output.traceback:
+            #         output_text += frame.splitlines()
+        self.output_section = output_text
+
+
+    def get_content(self):
+        content = self.header.text + self.source.text + self.footer.text
+        if len(self.outputs) != 0:
+            content += self.output_section + [""]
+        return content
 
 
 class RawCell(Cell):
