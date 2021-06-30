@@ -6,26 +6,22 @@ from . import cell
 class Notebook:
     def __init__(self, filename, bufnr, nvim, lua_bridge) -> None:
         self._nb = nbformat.read(filename, as_version=4)
-        self._cells = []
+        self.cells = []
 
         self._nvim = nvim
         self._lua_bridge = lua_bridge
 
         self.bufnr = bufnr
 
-
+        # use _cell to not conflict with cell submodule
         for _cell in self._nb.cells:
             type = _cell.cell_type
             if type == "markdown":
-                self._cells.append(cell.MarkdownCell(_cell))
+                self.cells.append(cell.MarkdownCell(_cell))
             elif type == "code":
-                self._cells.append(cell.CodeCell(_cell))
+                self.cells.append(cell.CodeCell(_cell))
             else:
-                self._cells.append(cell.RawCell(_cell))
-
-    def cells(self):
-        for cell in self._cells:
-            yield cell
+                self.cells.append(cell.RawCell(_cell))
 
     def draw_full(self):
         code = []
