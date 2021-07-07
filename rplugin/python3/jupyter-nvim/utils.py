@@ -28,8 +28,8 @@ class Notebook:
         header = []
 
         code = []
-        for cell in self.cells:
-            content = cell.get_content()
+        for _cell in self.cells:
+            content = _cell.get_content()
             code += content
             header.append(line_num)
             line_num += len(content)
