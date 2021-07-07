@@ -10,6 +10,10 @@ class JupyterNvim:
         self.lua_bridge = self.nvim.lua._jupiter_nvim
         self.notebook_manager = utils.NotebookManager(self.nvim, self.lua_bridge)
 
+        if not self.nvim.funcs.hlexists("JupyterNvimHeader"):
+            self.nvim.command("highlight link JupyterNvimHeader CursorLine")
+        self.nvim.funcs.sign_define("JupyterNvimHeaderSign", {"linehl": "JupyterNvimHeader"})
+
     @pynvim.function("JupiterSave")
     def writeNotebook(self, filename):
         self.nvim.api.buf_set_option(0, "modified", False)

@@ -24,12 +24,22 @@ class Notebook:
                 self.cells.append(cell.RawCell(_cell))
 
     def draw_full(self):
+        line_num = 1
+        header = []
+
         code = []
-        for cell in self.cells():
-            code += cell.get_content()
+        for cell in self.cells:
+            content = cell.get_content()
+            code += content
+            header.append(line_num)
+            line_num += len(content)
 
         lines = self._nvim.api.buf_line_count(self.bufnr)
         self._lua_bridge.utils.buf_set_lines(self.bufnr, False, 0, lines, False, code, async_=True)
+
+        for head in header:
+            self._nvim.funcs.sign_place(0, "Header", "JupyterNvimHeaderSign",
+                                        self.bufnr, {"lnum":head})
 
 
 class NotebookManager:
