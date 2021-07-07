@@ -35,11 +35,14 @@ class Notebook:
             line_num += len(content)
 
         lines = self._nvim.api.buf_line_count(self.bufnr)
-        self._lua_bridge.utils.buf_set_lines(self.bufnr, False, 0, lines, False, code, async_=True)
+        self._lua_bridge.utils.buf_set_lines(
+            self.bufnr, False, 0, lines, False, code, async_=True
+        )
 
         for head in header:
-            self._nvim.funcs.sign_place(0, "Header", "JupyterNvimHeaderSign",
-                                        self.bufnr, {"lnum":head})
+            self._nvim.funcs.sign_place(
+                0, "Header", "JupyterNvimHeaderSign", self.bufnr, {"lnum": head}
+            )
 
 
 class NotebookManager:
@@ -75,25 +78,25 @@ class AtomicCall:
 
 
 def create_jupyter_buffer(nvim):
-        old_bufnr = nvim.current.buffer.number
-        old_buf_name = nvim.api.buf_get_name(old_bufnr)
+    old_bufnr = nvim.current.buffer.number
+    old_buf_name = nvim.api.buf_get_name(old_bufnr)
 
-        buf = nvim.api.create_buf(True, False)
-        bufnr = buf.number
+    buf = nvim.api.create_buf(True, False)
+    bufnr = buf.number
 
-        start_call = AtomicCall(nvim)
-        start_call.add_call("nvim_command", f"buffer {bufnr}")
-        start_call.add_call("nvim_command", f"bdelete {old_bufnr}")
+    start_call = AtomicCall(nvim)
+    start_call.add_call("nvim_command", f"buffer {bufnr}")
+    start_call.add_call("nvim_command", f"bdelete {old_bufnr}")
 
-        start_call.add_call("nvim_command", "setlocal nonumber")
-        start_call.add_call("nvim_command", "setlocal signcolumn=no")
-        start_call.add_call("nvim_command", "setlocal conceallevel=3")
-        start_call.add_call("nvim_command", "setlocal concealcursor=nvic")
+    start_call.add_call("nvim_command", "setlocal nonumber")
+    start_call.add_call("nvim_command", "setlocal signcolumn=no")
+    start_call.add_call("nvim_command", "setlocal conceallevel=3")
+    start_call.add_call("nvim_command", "setlocal concealcursor=nvic")
 
-        start_call.add_call("nvim_buf_set_name", bufnr, old_buf_name)
-        start_call.add_call("nvim_buf_set_option", bufnr, "modifiable", False)
-        start_call.add_call("nvim_buf_set_option", bufnr, "buftype", "acwrite")
-        start_call.add_call("nvim_command", "au BufWriteCmd <buffer>  call JupiterSave()")
-        start_call.call(async_=True)
+    start_call.add_call("nvim_buf_set_name", bufnr, old_buf_name)
+    start_call.add_call("nvim_buf_set_option", bufnr, "modifiable", False)
+    start_call.add_call("nvim_buf_set_option", bufnr, "buftype", "acwrite")
+    start_call.add_call("nvim_command", "au BufWriteCmd <buffer>  call JupiterSave()")
+    start_call.call(async_=True)
 
-        return bufnr
+    return bufnr

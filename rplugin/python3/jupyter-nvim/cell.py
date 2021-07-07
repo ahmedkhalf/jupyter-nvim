@@ -64,7 +64,6 @@ class CodeCell(Cell):
 
         super().__init__(cell)
 
-
     def init_header(self):
         exec_count = f"[{self.execution_count or ' '}] "
         actions = "Run Code | Delete Cell "
@@ -88,7 +87,6 @@ class CodeCell(Cell):
             #         output_text += frame.splitlines()
         self.output_section = output_text
 
-
     def get_content(self):
         content = self.header.text + self.source.text + self.footer.text
         if len(self.outputs) != 0:
@@ -100,7 +98,6 @@ class RawCell(Cell):
     def __init__(self, cell) -> None:
         super().__init__(cell)
 
-
     def init_header(self):
         actions = "Delete Cell"
 
@@ -108,4 +105,3 @@ class RawCell(Cell):
 
     def init_footer(self):
         return
-
