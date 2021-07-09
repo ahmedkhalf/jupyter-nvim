@@ -77,23 +77,15 @@ class AtomicCall:
         self.nvim.api.call_atomic(self.calls, async_=async_)
 
 
-def create_jupyter_buffer(nvim):
-    old_bufnr = nvim.current.buffer.number
-    old_buf_name = nvim.api.buf_get_name(old_bufnr)
-
-    buf = nvim.api.create_buf(True, False)
-    bufnr = buf.number
+def prepare_jupyter_buffer(nvim):
+    bufnr = nvim.current.buffer.number
 
     start_call = AtomicCall(nvim)
-    start_call.add_call("nvim_command", f"buffer {bufnr}")
-    start_call.add_call("nvim_command", f"bdelete {old_bufnr}")
-
     start_call.add_call("nvim_command", "setlocal nonumber")
     start_call.add_call("nvim_command", "setlocal signcolumn=no")
     start_call.add_call("nvim_command", "setlocal conceallevel=3")
     start_call.add_call("nvim_command", "setlocal concealcursor=nvic")
 
-    start_call.add_call("nvim_buf_set_name", bufnr, old_buf_name)
     start_call.add_call("nvim_buf_set_option", bufnr, "modifiable", False)
     start_call.add_call("nvim_buf_set_option", bufnr, "buftype", "acwrite")
     start_call.add_call("nvim_command", "au BufWriteCmd <buffer>  call JupiterSave()")

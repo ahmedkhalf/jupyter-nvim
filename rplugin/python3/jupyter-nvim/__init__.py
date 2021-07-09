@@ -25,11 +25,10 @@ class JupyterNvim:
             True,
         )
 
-    @pynvim.autocmd(
-        "BufReadPost", pattern="*.ipynb", eval='expand("<afile>")', sync=True
-    )
+    @pynvim.autocmd("BufReadCmd", pattern="*.ipynb", eval='expand("%:p")', sync=True)
     def openNotebook(self, filename):
-        bufnr = utils.create_jupyter_buffer(self.nvim)
+        bufnr = utils.prepare_jupyter_buffer(self.nvim)
+
         self.lua_bridge.utils.add_syntax(
             "python", "@begin=py@", "@end=py@", "SpecialComment", async_=True
         )
