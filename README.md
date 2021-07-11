@@ -6,6 +6,56 @@ Read jupyter notebooks in neovim
 
 *Note:* The plugin is still in alpha stage
 
+## ⚡️ Requirements
+
+- Neovim >= 0.5.0
+
+## 📦 Installation
+
+Install the plugin with your preferred package manager:
+
+### [vim-plug](https://github.com/junegunn/vim-plug)
+
+```vim
+" Vim Script
+Plug 'ahmedkhalf/jupyter-nvim', { 'do': ':UpdateRemotePlugins' }
+
+lua << EOF
+  require("jupyter-nvim").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+  }
+EOF
+```
+
+### [packer](https://github.com/wbthomason/packer.nvim)
+
+```lua
+-- Lua
+use {
+  "ahmedkhalf/jupyter-nvim",
+  run = ":UpdateRemotePlugins",
+  config = function()
+    require("jupyter-nvim").setup {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
+  end
+}
+```
+
+## ⚙️ Configuration
+
+**jupyter-nvim** comes with the following defaults:
+
+```lua
+{
+  -- Nothing till now
+}
+```
+
 ## 👾 Usage
 
 Just open any `*.ipynb` file and voila!
